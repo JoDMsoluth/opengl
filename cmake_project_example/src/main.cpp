@@ -1,35 +1,32 @@
+#include <spdlog/spdlog.h>
 #include <GLFW/glfw3.h>
 
-int main(void)
-{
-    GLFWwindow* window;
+int main(int argc, const char** argv) {
+    // 시작을 알리는 로그
+    SPDLOG_INFO("Start program");
 
-    /* Initialize the library */
-    if (!glfwInit())
+    // glfw 라이브러리 초기화, 실패하면 에러 출력후 종료
+    SPDLOG_INFO("Initialize glfw");
+    if (!glfwInit()) {
+        const char* description = nullptr;
+        glfwGetError(&description);
+        SPDLOG_ERROR("failed to initialize glfw: {}", description);
         return -1;
+    }
 
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "GLFW CMake starter", NULL, NULL);
-    if (!window)
-    {
+    // glfw 윈도우 생성, 실패하면 에러 출력후 종료
+    SPDLOG_INFO("Create glfw window");
+    auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_NAME,
+      nullptr, nullptr);
+    if (!window) {
+        SPDLOG_ERROR("failed to create glfw window");
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    glClearColor( 0.4f, 0.3f, 0.4f, 0.0f );
-
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
+    // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
+    SPDLOG_INFO("Start main loop");
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
     }
 

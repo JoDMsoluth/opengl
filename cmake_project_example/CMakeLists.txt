@@ -8,6 +8,11 @@ set(PROJECT_SRC src/main.cpp)
 # C++ 17버전 사용
 set(CMAKE_CXX_STANDARD 17)
 
+# 환경변수
+set(WINDOW_NAME "Hello, OpenGL!")
+set(WINDOW_WIDTH 640)
+set(WINDOW_HEIGHT 480)
+
 project(${PROJECT_NAME})
 
 find_package( OpenGL REQUIRED )
@@ -63,6 +68,14 @@ endif()
 add_executable(${PROJECT_NAME} WIN32 ${PROJECT_SRC})
 
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw glad glm spdlog)
+
+# 환경변수 주입
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+    WINDOW_NAME="${WINDOW_NAME}"
+    WINDOW_WIDTH=${WINDOW_WIDTH}
+    WINDOW_HEIGHT=${WINDOW_HEIGHT}
+    )
+
 
 if( MSVC )
     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 

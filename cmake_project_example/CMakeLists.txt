@@ -2,10 +2,72 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(PROJECT_NAME cmake_project_example)
+set(PROJECT_SRC src/main.cpp)
+
 # CXX === C++ 이란 같은 말
 # C++ 17버전 사용
 set(CMAKE_CXX_STANDARD 17)
 
 project(${PROJECT_NAME})
+
+find_package( OpenGL REQUIRED )
+
+
+# --- Import tools ----
+
+include(cmake/tools.cmake)
+
+# ---- Dependencies ----
+
+include(cmake/CPM.cmake)
+
+# spdlog
+CPMAddPackage(
+  NAME spdlog
+  GITHUB_REPOSITORY gabime/spdlog
+  GIT_TAG v2.x
+)
+
+# GLM
+CPMAddPackage(
+  NAME glm
+  GITHUB_REPOSITORY g-truc/glm
+  GIT_TAG 0.9.9.8
+)
+
+# GLFW
+CPMAddPackage(
+  NAME glfw
+  GITHUB_REPOSITORY glfw/glfw
+  GIT_TAG 3.3.8
+  OPTIONS
+	"GLFW_BUILD_TESTS Off"
+	"GLFW_BUILD_EXAMPLES Off"
+	"GLFW_BUILD_DOCS Off"
+    "GLFW_INSTALL Off"
+    "GLFW_USE_HYBRID_HPG On"
+)
+
+include_directories( ${OPENGL_INCLUDE_DIRS} )
+
+set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
+set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
+
+add_subdirectory( glad )
+
+if( MSVC )
+    SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
+endif()
+
 # src/main.cpp을 컴파일해 실행파일을 만듦
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} WIN32 ${PROJECT_SRC})
+
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} glfw glad glm spdlog)
+
+if( MSVC )
+    if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
+        message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'GLFW-CMake-starter' as StartUp Project in Visual Studio.\n" )
+    else()
+        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GLFW-CMake-starter )
+    endif()
+endif()

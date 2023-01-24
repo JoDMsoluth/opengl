@@ -2,7 +2,13 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(PROJECT_NAME cmake_project_example)
-set(PROJECT_SRC src/main.cpp)
+set(PROJECT_SRC src/main.cpp
+  src/buffer.cpp src/buffer.h
+  src/common.cpp src/common.h
+  src/context.cpp src/context.h
+  src/program.cpp src/program.h
+  src/shader.cpp src/shader.h
+  src/vertex_layout.cpp src/vertex_layout.h)
 
 # CXX === C++ 이란 같은 말
 # C++ 17버전 사용

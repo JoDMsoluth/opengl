@@ -1,6 +1,5 @@
-#include <spdlog/spdlog.h>
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
+#include "common.h"
+#include "context.h"
 
 void OnFramebufferSizeChange(GLFWwindow* window, int width, int height) {
   SPDLOG_INFO("framebuffer size change: ({} * {})", width, height);
@@ -22,6 +21,10 @@ void OnKeyEvent(GLFWwindow* window,
     }
 }
 
+void Render() {
+    glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
 
 int main(int argc, const char** argv) {
     // 시작을 알리는 로그
@@ -63,22 +66,26 @@ int main(int argc, const char** argv) {
     glfwSetFramebufferSizeCallback(window, OnFramebufferSizeChange);
     glfwSetKeyCallback(window, OnKeyEvent);
 
+    auto context = Context::Create();
+    if (!context) {
+        SPDLOG_ERROR("failed to create context");
+        glfwTerminate();
+        return -1;
+    }
+
     // glfw 루프 실행, 윈도우 close 버튼을 누르면 정상 종료
     SPDLOG_INFO("Start main loop");
     while (!glfwWindowShouldClose(window)) {
-        // 1/60초 마다 이벤트 수집
-        glfwPollEvents();
-
-        // 윈도우 색상 렌더링 
-        glClearColor(0.0f, 0.1f, 0.2f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        context->Render();
 
         // 더블 버퍼링
         // 그림이 그려지는 과정이 보여지지 않기 위해 화면의 렌더링하기 위하기 위한 버퍼는 2개 생성
         // 백버퍼(화면에 보이지 않는 버퍼), 프론트버퍼(화면에 보이는 버퍼)
         // 백버퍼에서 미리 그리고 프론트버퍼와 Swapping해서 화면에 보임
         glfwSwapBuffers(window); 
-    }  
+        glfwPollEvents();
+    }
+    // context.reset();
 
     glfwTerminate();
     return 0;
